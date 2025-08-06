@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>💳 ATM System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- Animate.css -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      overflow-x: hidden;
+      position: relative;
+      color: #000;
+    }
+
+    /* 🔥 Live animated gradient background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, #0d6efd55, #0d6efd22, #00000088);
+      animation: bgMotion 25s linear infinite;
+      z-index: -2;
+    }
+
+    @keyframes bgMotion {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(-25%, -25%) scale(1.2); }
+      100% { transform: translate(0, 0) scale(1); }
+    }
+
+    /* 🏦 Floating bank logo or icons (extra vibe) */
+    .floating-coins {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: -1;
+    }
+
+    .coin {
+      position: absolute;
+      animation: floatCoin 12s linear infinite;
+      opacity: 0.3;
+      font-size: 30px;
+    }
+
+    @keyframes floatCoin {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+      }
+      50% {
+        opacity: 0.6;
+      }
+      100% {
+        transform: translateY(-100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    .atm-box {
+      max-width: 500px;
+      margin: 80px auto;
+      padding: 30px;
+      background: #ffffffee;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      animation: fadeInUp 1s;
+      backdrop-filter: blur(15px);
+    }
+
+    h2 {
+      font-weight: 600;
+      color: #0d6efd;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .btn-primary {
+      background-color: #0d6efd;
+      color: #fff;
+      font-weight: 600;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 16px;
+      width: 100%;
+      transition: 0.3s ease-in-out;
+    }
+
+    .btn-primary:hover {
+      background-color: #0a58ca;
+      transform: scale(1.05);
+    }
+
+    .footer {
+      text-align: center;
+
+      color: #fff;
+      font-size: 60px;
+      margin-top: 10px;
+     
+
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 💸 Floating Icons (bank coins, emojis, etc) -->
+  <div class="floating-coins">
+    <div class="coin" style="left: 10%; animation-delay: 0s;">💳</div>
+    <div class="coin" style="left: 30%; animation-delay: 3s;">💸</div>
+    <div class="coin" style="left: 50%; animation-delay: 6s;">🏦</div>
+    <div class="coin" style="left: 70%; animation-delay: 2s;">💰</div>
+    <div class="coin" style="left: 90%; animation-delay: 4s;">📈</div>
+  </div>
+
+  <div class="atm-box animate__animated animate__fadeInUp">
+    <h2>🏦 ATM Banking System</h2>
+
+    <form method="POST" onsubmit="return handleFormSubmit(event)">
+      <div class="mb-3">
+        <label for="account" class="form-label">🔢 Account Number</label>
+        <input type="text" class="form-control" id="account" name="account" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="action" class="form-label">⚙️ Select Action</label>
+        <select class="form-select" id="action" name="action" required>
+          <option value="">-- Choose Action --</option>
+          <option value="check_balance">Check Balance 🧾</option>
+          <option value="deposit">Deposit 💰</option>
+          <option value="withdraw">Withdraw 💸</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label for="amount" class="form-label">💵 Amount (₹)</label>
+        <input type="number" class="form-control" id="amount" name="amount" placeholder="Only for Deposit or Withdraw">
+      </div>
+
+      <button type="submit" class="btn btn-primary">🚀 Submit</button>
+    </form>
+
+    {% if message %}
+    <div class="result alert alert-success animate__animated animate__fadeIn mt-4">
+      {{ message }}
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="footer">
+    Made with ❤️ by Rajat Jaiswal
+  </div>
+
+  <!-- ✅ SweetAlert2 Script -->
+  <script>
+    function handleFormSubmit(event) {
+      event.preventDefault();
+
+      const account = document.getElementById('account').value;
+      const action = document.getElementById('action').value;
+      const amount = document.getElementById('amount').value;
+
+      if (!account || !action) {
+        Swal.fire("⚠️ Required", "Please fill out all required fields.", "warning");
+        return false;
+      }
+
+      if ((action === 'deposit' || action === 'withdraw')) {
+        if (!amount || parseInt(amount) <= 0) {
+          Swal.fire("❌ Invalid Amount", "Please enter a valid amount greater than ₹0.", "error");
+          return false;
+        }
+
+        Swal.fire({
+          title: `Are you sure?`,
+          text: `${action === 'deposit' ? "Deposit 💰" : "Withdraw 💸"} ₹${amount} to/from Account #${account}?`,
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, proceed!',
+          cancelButtonText: 'No, cancel'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            Swal.fire("✅ Success", `${action.charAt(0).toUpperCase() + action.slice(1)} of ₹${amount} confirmed.`, "success")
+              .then(() => event.target.submit());
+          }
+        });
+
+      } else if (action === 'check_balance') {
+        Swal.fire("📊 Balance", `Fetching balance for Account #${account}...`, "info")
+          .then(() => event.target.submit());
+      }
+    }
+  </script>
+
+</body>
+</html>
